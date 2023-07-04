@@ -1,10 +1,11 @@
 import os
-import random
 import sys
+import random
+
 from datetime import datetime
 from typing import Any, Callable
 
-from voice_changer import VoiceChangerIO
+from voicechangerio import VoiceChangerIO
 
 
 def measure_time(func: Callable[..., Any]) -> Callable[..., Any]:
