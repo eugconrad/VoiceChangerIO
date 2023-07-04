@@ -12,8 +12,8 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.webdriver import WebDriver as ChromeWebDriver
 from selenium.webdriver.common.by import By
 
-from errors import BadRequest
-from models import VoiceEffect
+from .errors import BadRequest
+from .models import VoiceEffect
 
 
 BASE_URL: Final[str] = "https://voicechanger.io/"

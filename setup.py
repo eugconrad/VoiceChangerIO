@@ -7,7 +7,7 @@ requirements = ["selenium>=4", "pydantic>=2"]
 
 setup(
     name="voicechangerio",
-    version="0.1.0",
+    version="0.1.1",
     author="Eugene Conrad",
     author_email="eugconrad@icloud.com",
     description="VoiceChangerIO is a Python library that provides an interface to the voice transformation "
