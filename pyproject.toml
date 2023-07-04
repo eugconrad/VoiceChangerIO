@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "voicechangerio"
+version = "0.1.1"
+description = "VoiceChangerIO is a Python library that provides an interface to the voice transformation functionality of the VoiceChanger.io website. It allows you to apply various voice effects to audio files programmatically using a web browser automation approach."
+authors = ["Eugene <orion25rus@gmail.com>"]
+license = "MPL-2.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+selenium = "^4.10.0"
+pydantic = "^2.0"
+
+[tool.poetry.group.dev.dependencies]
+setuptools = "^68.0.0"
+wheel = "^0.40.0"
+twine = "^4.0.2"
+poetry = "^1.5.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
