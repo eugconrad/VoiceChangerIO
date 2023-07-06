@@ -1,16 +1,16 @@
 
-import base64
 import os
 import re
-import time
+import base64
+
 from contextlib import suppress
 from typing import Optional, Union, List, cast, Literal, Final
 
-from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver import Chrome
+from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.webdriver import WebDriver as ChromeWebDriver
-from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchElementException
 
 from .errors import BadRequest
 from .models import VoiceEffect
@@ -19,21 +19,18 @@ from .models import VoiceEffect
 BASE_URL: Final[str] = "https://voicechanger.io/"
 
 
-class VoiceChangerIO:
+class VoiceChangerIO():
     driver: ChromeWebDriver
-    target_site: str
     voice_effects: List[VoiceEffect]
 
     def __init__(self, *driver_options: str) -> None:
         self.driver = self.create_webdriver(*driver_options)
-        self.driver.get(BASE_URL)
-        self.voice_effects = self.get_voice_effects()
+        self.reload()
 
     @staticmethod
     def create_webdriver(*options: str) -> ChromeWebDriver:
         chrome_options = ChromeOptions()
         [chrome_options.add_argument(option) for option in options]
-
         return Chrome(options=chrome_options)
 
     def get_file_content_chrome(self, uri: str) -> bytes:
@@ -52,6 +49,11 @@ class VoiceChangerIO:
             raise BadRequest("Request failed with status code {}", result)
         return base64.b64decode(result)
 
+    def reload(self) -> Literal[True]:
+        self.driver.get(BASE_URL)
+        self.voice_effects = self.get_voice_effects()
+        return True
+
     def get_voice_effects(self) -> List[VoiceEffect]:
         voice_effects_element = self.driver.find_elements(By.XPATH, "/html/body/section[4]/div/*")
         voice_effects = []
@@ -69,8 +71,30 @@ class VoiceChangerIO:
                     voice_effects.append(
                         VoiceEffect(id=i, title=title, element=element)
                     )
-
         return voice_effects
+
+    def update_voice_effects(self) -> Literal[True]:
+        self.voice_effects = self.get_voice_effects()
+        return True
+
+    def find_voice_effect(
+            self, voice_effect_id: Optional[int] = None, voice_effect_title: Optional[str] = None
+    ) -> Optional[VoiceEffect]:
+        for voice_effect in self.voice_effects:
+            if (voice_effect_id is not None and voice_effect.id == voice_effect_id) or (
+                    voice_effect_title and voice_effect.title.lower() == voice_effect_title.lower()):
+                return voice_effect
+        return None
+
+    def search_voice_effects(
+            self, voice_effect_id: Optional[int] = None, voice_effect_title: Optional[str] = None
+    ) -> List[VoiceEffect]:
+        result = []
+        for voice_effect in self.voice_effects:
+            if (voice_effect_id is not None and voice_effect.id == voice_effect_id) or (
+                    voice_effect_title and voice_effect.title.lower() == voice_effect_title.lower()):
+                result.append(voice_effect)
+        return result
 
     def upload_audio(self, audio_file: Union[bytes, str]) -> Literal[True]:
         file_input = self.driver.find_element(By.XPATH, "/html/body/section[3]/div[1]/div[1]/input")
@@ -98,7 +122,7 @@ class VoiceChangerIO:
     def save_audio_file(audio_file: bytes, custom_name: Optional[str] = None) -> str:
         if custom_name and not custom_name.lower().endswith(".mp3"):
             custom_name += ".mp3"
-        file_path = os.path.abspath(custom_name or f"VoiceChangerIO-{int(time.time())}.mp3")
+        file_path = os.path.abspath(custom_name or f".VoiceChangerIO.mp3")
         with open(file_path, "wb") as binary_file:
             binary_file.write(audio_file)
         return file_path
